@@ -3,6 +3,7 @@ package models
 import (
 	"database/sql"
 	"fmt"
+
 	"github.com/Erich-D/mastermind/entities"
 )
 
@@ -10,8 +11,8 @@ type GameModel struct {
 	Db *sql.DB
 }
 
-func (db GameModel) Update(game *entities.Game) (int64, error) {
-	result, err := db.Db.Exec("UPDATE game SET answer = ?, inProgress = ? WHERE gameId = ?", game.Answer, game.Status, game.ID)
+func (db GameModel) Update(obj *entities.Game) (int64, error) {
+	result, err := db.Db.Exec("UPDATE game SET answer = ?, inProgress = ? WHERE gameId = ?", obj.Answer, obj.Status, obj.ID)
 	if err != nil {
 		return 0, fmt.Errorf("updategame: %v", err)
 	} else {
@@ -19,8 +20,8 @@ func (db GameModel) Update(game *entities.Game) (int64, error) {
 	}
 }
 
-func (gameModel GameModel) Add(game *entities.Game) (int64, error) {
-	result, err := gameModel.Db.Exec("INSERT INTO game (answer) VALUES (?)", game.Answer)
+func (db GameModel) Add(obj *entities.Game) (int64, error) {
+	result, err := db.Db.Exec("INSERT INTO game (answer) VALUES (?)", obj.Answer)
 	if err != nil {
 		return 0, fmt.Errorf("Addgame: %v", err)
 	}
