@@ -24,8 +24,7 @@ func GetGames() ([]entities.Game, error) {
 	gms, err := gm.FindAll()
 	if err != nil {
 		log.Fatal(err)
-		fmt.Errorf("GetGames %v", err)
-		return nil, err
+		return nil, fmt.Errorf("GetGames %v", err)
 	}
 	for indx, val := range gms {
 		if val.Status {
@@ -39,8 +38,7 @@ func GameById(id int64) (entities.Game, error) {
 	g, err := gm.Find(id)
 	if err != nil {
 		log.Fatal(err)
-		fmt.Errorf("GetById %d: %v", id, err)
-		return g, err
+		return g, fmt.Errorf("GetById %d: %v", id, err)
 	}
 	if g.Status {
 		g.Answer = "????"
@@ -54,7 +52,7 @@ func NewGame() (entities.Game, error) {
 	id, err := gm.Add(&newGame)
 	if err != nil {
 		log.Fatal(err)
-		fmt.Errorf("AddNewGame %v", err)
+		return newGame, fmt.Errorf("AddNewGame %v", err)
 	}
 	g, err1 := gm.Find(id)
 	if err1 != nil {
@@ -70,6 +68,9 @@ func Guess(rnd entities.Round) (entities.Round, error) {
 	thisGame, err1 := gm.Find(int64(id))
 	if err1 != nil {
 		return rnd, fmt.Errorf(err1.Error())
+	}
+	if !thisGame.Status {
+		return rnd, fmt.Errorf("Game already solved")
 	}
 	rnd.GuessResult = testGuess(thisGame, rnd.Guess)
 	rid, err2 := rm.Add(&rnd)
@@ -99,7 +100,7 @@ func GetRounds(id int64) ([]entities.Round, error) {
 func creatAnswer() string {
 
 	ansBytes := make([]byte, 4)
-	for indx, _ := range ansBytes {
+	for indx := range ansBytes {
 		ansBytes[indx] = answerGen(ansBytes)
 	}
 	return string(ansBytes[:])
